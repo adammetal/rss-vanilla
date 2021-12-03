@@ -1,4 +1,18 @@
-const saved = [];
+const ARTICLE_KEY = "saved-news";
+
+function loadArticles() {
+  const raw = localStorage.getItem(ARTICLE_KEY);
+  if (!raw) {
+    return [];
+  } else {
+    return JSON.parse(raw);
+  }
+}
+
+function saveArticles() {
+  const raw = JSON.stringify(state.saved);
+  localStorage.setItem(ARTICLE_KEY, raw);
+}
 
 function parseHtml(str) {
   const parser = new DOMParser();
@@ -34,6 +48,7 @@ function News(news) {
 
     const itemDiv = Item({ title, desc, link }, () => {
       state.saved.push({ title, desc, link });
+      saveArticles();
       renderApplication();
     });
 
@@ -78,7 +93,7 @@ function Item(item, onSave) {
 
 const state = {
   news: [],
-  saved: [],
+  saved: loadArticles(),
 };
 
 const effects = [];
@@ -91,7 +106,7 @@ const effect = (name, cb) => {
 };
 
 function NewsContainer() {
-  effect('fetchFeed', () => {
+  effect("fetchFeed", () => {
     fetch("https://dev.to/feed/")
       .then((res) => res.text())
       .then((res) => parseXml(res))
