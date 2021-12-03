@@ -1,3 +1,19 @@
+const ARTICLE_KEY = "saved-news";
+
+function loadArticles() {
+  const raw = localStorage.getItem(ARTICLE_KEY);
+  if (!raw) {
+    return [];
+  } else {
+    return JSON.parse(raw);
+  }
+}
+
+function saveArticles() {
+  const raw = JSON.stringify(state.saved);
+  localStorage.setItem(ARTICLE_KEY, raw);
+}
+
 function parseHtml(str) {
   const parser = new DOMParser();
   return parser.parseFromString(str, "text/html");
@@ -32,7 +48,7 @@ function News(news) {
 
     const itemDiv = Item({ title, desc, link }, () => {
       state.saved.push({ title, desc, link });
-      localStorage.setItem("saved-news", JSON.stringify(state.saved));
+      saveArticles();
       renderApplication();
     });
 
@@ -77,7 +93,7 @@ function Item(item, onSave) {
 
 const state = {
   news: [],
-  saved: JSON.parse(localStorage.getItem("saved-news")) ?? [],
+  saved: loadArticles(),
 };
 
 const effects = [];
