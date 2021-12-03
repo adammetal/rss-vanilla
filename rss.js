@@ -1,5 +1,3 @@
-const saved = [];
-
 function parseHtml(str) {
   const parser = new DOMParser();
   return parser.parseFromString(str, "text/html");
@@ -34,6 +32,7 @@ function News(news) {
 
     const itemDiv = Item({ title, desc, link }, () => {
       state.saved.push({ title, desc, link });
+      localStorage.setItem("saved-news", JSON.stringify(state.saved));
       renderApplication();
     });
 
@@ -78,7 +77,7 @@ function Item(item, onSave) {
 
 const state = {
   news: [],
-  saved: [],
+  saved: JSON.parse(localStorage.getItem("saved-news")) ?? [],
 };
 
 const effects = [];
@@ -91,7 +90,7 @@ const effect = (name, cb) => {
 };
 
 function NewsContainer() {
-  effect('fetchFeed', () => {
+  effect("fetchFeed", () => {
     fetch("https://dev.to/feed/")
       .then((res) => res.text())
       .then((res) => parseXml(res))
