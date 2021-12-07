@@ -20,8 +20,6 @@ function removeArticle(url) {
     return a.link !== url;
   });
   state.saved = nextArticles;
-  renderApplication();
-  saveArticles();
 }
 
 function parseHtml(str) {
@@ -65,6 +63,8 @@ function News(news) {
       },
       () => {
         removeArticle(link);
+        renderApplication();
+        saveArticles();
       }
     );
 
