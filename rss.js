@@ -47,7 +47,7 @@ function parseNews(newsDomTree) {
   return news;
 }
 
-function News(news) {
+function News(news, onDelete) {
   const itemDivs = [];
   for (const item of news) {
     const title = item.title;
@@ -61,11 +61,7 @@ function News(news) {
         saveArticles();
         renderApplication();
       },
-      () => {
-        removeArticle(link);
-        renderApplication();
-        saveArticles();
-      }
+      onDelete
     );
 
     itemDivs.push(itemDiv);
@@ -108,7 +104,7 @@ function Item(item, onSave, onDelete) {
     const del = document.createElement("button");
     del.innerText = "Delete";
 
-    del.onclick = onDelete;
+    del.onclick = () => onDelete(link);
 
     const delDiv = document.createElement("div");
     delDiv.append(del);
@@ -149,7 +145,11 @@ function NewsContainer() {
 }
 
 function SavedContainer() {
-  const items = News(state.saved);
+  const items = News(state.saved, (link) => {
+    removeArticle(link);
+    renderApplication();
+    saveArticles();
+  });
   return items;
 }
 
