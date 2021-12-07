@@ -14,6 +14,14 @@ function saveArticles() {
   localStorage.setItem(ARTICLE_KEY, raw);
 }
 
+function removeArticle(url) {
+  const articles = loadArticles();
+  const nextArticles = articles.filter((a) => {
+    return a.link !== url;
+  });
+  state.saved = nextArticles;
+}
+
 function parseHtml(str) {
   const parser = new DOMParser();
   return parser.parseFromString(str, "text/html");
@@ -39,25 +47,29 @@ function parseNews(newsDomTree) {
   return news;
 }
 
-function News(news) {
+function News(news, onDelete) {
   const itemDivs = [];
   for (const item of news) {
     const title = item.title;
     let desc = item.desc;
     const link = item.link;
 
-    const itemDiv = Item({ title, desc, link }, () => {
-      state.saved.push({ title, desc, link });
-      saveArticles();
-      renderApplication();
-    });
+    const itemDiv = Item(
+      { title, desc, link },
+      () => {
+        state.saved.push({ title, desc, link });
+        saveArticles();
+        renderApplication();
+      },
+      onDelete
+    );
 
     itemDivs.push(itemDiv);
   }
   return itemDivs;
 }
 
-function Item(item, onSave) {
+function Item(item, onSave, onDelete) {
   const title = item.title;
   const desc = item.desc;
   const link = item.link;
@@ -86,6 +98,17 @@ function Item(item, onSave) {
     const saveDiv = document.createElement("div");
     saveDiv.append(save);
     div.append(saveDiv);
+  }
+
+  if (onDelete) {
+    const del = document.createElement("button");
+    del.innerText = "Delete";
+
+    del.onclick = () => onDelete(link);
+
+    const delDiv = document.createElement("div");
+    delDiv.append(del);
+    div.append(delDiv);
   }
 
   return div;
@@ -122,7 +145,11 @@ function NewsContainer() {
 }
 
 function SavedContainer() {
-  const items = News(state.saved);
+  const items = News(state.saved, (link) => {
+    removeArticle(link);
+    renderApplication();
+    saveArticles();
+  });
   return items;
 }
 
