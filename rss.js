@@ -165,11 +165,3 @@ function renderApplication() {
 }
 
 renderApplication();
-
-window.addEventListener("click", () => {
-  console.log("click on window");
-});
-
-document.addEventListener("click", () => {
-  console.log("click on document");
-});
